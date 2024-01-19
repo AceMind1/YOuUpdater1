@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         YOUadblockerfree
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      3.5
 // @description  Removes Adblock Thing with Enhanced GUI
-// @author       YOU Team
+// @author       JoelMatic
 // @match        https://www.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // ==/UserScript==
@@ -31,11 +31,15 @@
             color: #fff;
             padding: 20px;
             display: none;
+            opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
         #${guiId} label {
             display: block;
             margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
         }
         #${guiId} input {
             margin-right: 5px;
@@ -52,10 +56,10 @@
     const guiHTML = `
         <div id="${guiId}">
             <div id="${guiId}-close">&times;</div>
-            <div style="font-size: 24px; font-weight: bold; color: #ff69b4; margin-bottom: 15px;">${guiName}</div>
-            <label><input type="checkbox" id="${adblockerCheckboxId}"> Enable Undetected Adblocker</label>
-            <label><input type="checkbox" id="${popupRemoverCheckboxId}"> Enable Popup Remover</label>
-            <label><input type="checkbox" id="${updateCheckCheckboxId}"> Enable Update Check</label>
+            <div style="font-size: 24px; font-weight: bold; color: #ff69b4; margin-bottom: 15px; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;">${guiName}</div>
+            <label style="opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;"><input type="checkbox" id="${adblockerCheckboxId}"> Enable Undetected Adblocker</label>
+            <label style="opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;"><input type="checkbox" id="${popupRemoverCheckboxId}"> Enable Popup Remover</label>
+            <label style="opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;"><input type="checkbox" id="${updateCheckCheckboxId}"> Enable Update Check</label>
         </div>
     `;
 
@@ -107,7 +111,10 @@
         if (e.key === "F2") {
             if (gui.style.display === "none") {
                 gui.style.display = "block";
-                gui.style.opacity = 1;
+                setTimeout(() => {
+                    gui.style.opacity = 1;
+                }, 50);
+                animateGUIElements();
             } else {
                 gui.style.opacity = 0;
                 setTimeout(() => {
@@ -122,6 +129,22 @@
             dragElement(gui);
         }
     });
+
+    function animateGUIElements() {
+        const labels = gui.querySelectorAll("label");
+        labels.forEach((label, index) => {
+            setTimeout(() => {
+                label.style.opacity = 1;
+                label.style.transform = "translateY(0)";
+            }, 100 * index);
+        });
+
+        const guiTitle = gui.querySelector("div[style*='font-size: 24px']");
+        setTimeout(() => {
+            guiTitle.style.opacity = 1;
+            guiTitle.style.transform = "translateY(0)";
+        }, 100 * labels.length);
+    }
 
     function dragElement(elmnt) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
